@@ -43,6 +43,9 @@ def lambda_handler(event, context):
             Threshold=0.0,
             TreatMissingData="missing",
             ActionsEnabled=True,
+            AlarmActions= [
+            "arn:aws:sns:us-east-1:091546708236:LambdaStack-AirFlowAlarmsE978FA02-MF61QF9IZCQO"
+            ],
             Metrics=[
                 {
                     "Id": "e1",
@@ -96,6 +99,9 @@ def lambda_handler(event, context):
             Threshold=0.0,
             TreatMissingData="breaching",
             ActionsEnabled=True,
+            AlarmActions= [
+            "arn:aws:sns:us-east-1:091546708236:LambdaStack-AirFlowAlarmsE978FA02-MF61QF9IZCQO"
+            ],
             Metrics=[
                 {
                     "Id": "m1",
@@ -114,5 +120,37 @@ def lambda_handler(event, context):
                     },
                 }
             ],
+            Tags=[{"Key": "MWAAEnvironment", "Value": env}],
+        )
+
+
+        print(f"Creating alarm Airflow-{env}-TotalParseTime")
+        cloudwatch.put_metric_alarm(
+            AlarmName=f"Airflow-{env}-TotalParseTime",
+            AlarmDescription="TotalParseTime higher than 2 seconds in avarege for 2 datapoints",
+            ComparisonOperator="GreaterThanThreshold",
+            EvaluationPeriods=2,
+            DatapointsToAlarm=2,
+            Threshold=2,
+            TreatMissingData="missing",
+            ActionsEnabled=True,
+            AlarmActions= [
+            "arn:aws:sns:us-east-1:091546708236:LambdaStack-AirFlowAlarmsE978FA02-MF61QF9IZCQO"
+            ],
+            InsufficientDataActions= [],
+            MetricName= "TotalParseTime",
+            Namespace= "AmazonMWAA",
+            Statistic= "Average",
+            Dimensions= [
+                {
+                    "Name": "Function",
+                    "Value": "DAG Processing"
+                },
+                {
+                    "Name": "Environment",
+                    "Value": "data-science"
+                }
+            ],
+            Period= 300,
             Tags=[{"Key": "MWAAEnvironment", "Value": env}],
         )
